@@ -1,3 +1,4 @@
 target/
-Sign-in.iml/
+*.iml
+.idea
 out/
