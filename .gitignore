@@ -2,4 +2,8 @@ target/
 *.iml
 .idea
 out/
-/Sign-in.iml
+
+/**/java*/META-INF/
+
+.DS_Store
+

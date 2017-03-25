@@ -5,6 +5,9 @@ import java.awt.*;
 
 /**
  * Created by Gunther on 3/23/17.
+ * This is a quick utility for the buttons.
+ * It basically sets the button undecorated
+ * or also known as flat button.
  */
 
 //Hello Git!!!
