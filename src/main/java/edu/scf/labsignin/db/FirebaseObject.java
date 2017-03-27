@@ -11,11 +11,17 @@ import com.firebase.client.Firebase;
  */
 public abstract class FirebaseObject {
 
-    protected final Firebase ref;
+    protected Firebase ref;
+
+    protected FirebaseObject() {}
     protected FirebaseObject(Firebase ref) {
         this.ref = ref;
     }
 
+    //Used to be set after de-serialization
+    public final void setRef(Firebase ref) {
+
+    }
     public final Firebase getRef() {
         return ref;
     }
