@@ -1,4 +1,6 @@
-import Util.ButtonUtil;
+package edu.scf.labsignin;
+
+import edu.scf.labsignin.util.ButtonUtil;
 import org.jdesktop.swingx.prompt.PromptSupport;
 
 import javax.swing.*;
@@ -7,7 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import static Util.HTMLUtil.*;
+import static edu.scf.labsignin.util.HTMLUtil.*;
 
 /**
  * Created by Gunther on 3/23/17.

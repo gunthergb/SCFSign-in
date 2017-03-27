@@ -1,6 +1,6 @@
-import com.firebase.client.Firebase;
+package edu.scf.labsignin;
 
-import java.util.HashMap;
+import com.firebase.client.Firebase;
 
 /**
  * Created by Natox on 3/25/2017.
@@ -55,7 +55,7 @@ public class Database {
 
     }
 
-    private static void auth(Firebase mRef) {
+    public static void auth(Firebase mRef) {
         String token = Token.genToken();
         System.out.println("Token:" + token);
         mRef.authWithCustomToken(token,null);

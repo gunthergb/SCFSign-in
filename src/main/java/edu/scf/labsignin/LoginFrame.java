@@ -1,7 +1,8 @@
-import Util.MyDocumentFilter;
+package edu.scf.labsignin;
+
+import edu.scf.labsignin.util.MyDocumentFilter;
 import com.firebase.client.*;
 import org.jdesktop.swingx.prompt.PromptSupport;
-import sun.rmi.runtime.Log;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -11,9 +12,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-
-import static com.sun.org.apache.xalan.internal.xsltc.compiler.sym.error;
-import static java.lang.System.in;
 
 /**
  * This is the main login form...

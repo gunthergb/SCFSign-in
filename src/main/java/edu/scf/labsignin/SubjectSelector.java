@@ -1,4 +1,4 @@
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
+package edu.scf.labsignin;
 
 import javax.swing.*;
 import java.awt.*;

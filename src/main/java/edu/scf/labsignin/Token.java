@@ -1,3 +1,5 @@
+package edu.scf.labsignin;
+
 import com.firebase.security.token.TokenGenerator;
 import com.firebase.security.token.TokenOptions;
 

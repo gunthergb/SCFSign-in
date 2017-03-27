@@ -1,4 +1,6 @@
-import Util.CurrentTime;
+package edu.scf.labsignin;
+
+import edu.scf.labsignin.util.CurrentTime;
 import com.firebase.client.Firebase;
 
 import javax.swing.*;

@@ -1,4 +1,4 @@
-package Util;
+package edu.scf.labsignin.util;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;

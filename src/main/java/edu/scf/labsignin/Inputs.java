@@ -1,3 +1,5 @@
+package edu.scf.labsignin;
+
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;

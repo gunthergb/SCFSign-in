@@ -1,4 +1,4 @@
-package Util;
+package edu.scf.labsignin.util;
 
 import java.awt.*;
 
