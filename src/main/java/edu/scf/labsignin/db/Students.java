@@ -58,7 +58,7 @@ public final class Students extends FirebaseObject {
             Date d = s.getLoginTime();
             DateFormat formater =  new SimpleDateFormat("yyyy/MMM/dd/hh");
             String path = formater.format(d);
-            Firebase day = history.child("day").child(path);
+            Firebase day = history.child("day").child(path).push();
             AsyncFirebaseWriter.setValue(day,he);
         }
     }
