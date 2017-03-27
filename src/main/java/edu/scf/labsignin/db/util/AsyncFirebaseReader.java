@@ -3,6 +3,7 @@ package edu.scf.labsignin.db.util;
 import com.firebase.client.*;
 import edu.scf.labsignin.db.FirebaseObject;
 
+import java.lang.reflect.Type;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -13,21 +14,32 @@ import java.util.concurrent.CountDownLatch;
 public final class AsyncFirebaseReader<T> implements ValueEventListener {
 
     private final CountDownLatch latch = new CountDownLatch(1);
-    private final Class<T> dataType;
+    private final GenericTypeIndicator<T> dataType;
     private T value;
     private FirebaseException error;
 
     private AsyncFirebaseReader() {
-        this(null);
+        this((Class)null);
     }
 
-    private AsyncFirebaseReader(Class<T> dataType) {
+    private AsyncFirebaseReader(GenericTypeIndicator<T> dataType) {
         this.dataType = dataType;
+    }
+    private AsyncFirebaseReader(Class<T> dataType) {
+        this(new GenericTypeIndicator<T>() {
+            @Override
+            public Type getType() {
+                return dataType;
+            }
+        });
     }
 
     //////////////////////////////////////////////////////////////////////////////////
 
     private static <T> AsyncFirebaseReader<T> create(Class<T> type) {
+        return new AsyncFirebaseReader<>(type);
+    }
+    private static <T> AsyncFirebaseReader<T> create(GenericTypeIndicator<T> type) {
         return new AsyncFirebaseReader<>(type);
     }
 
@@ -37,8 +49,18 @@ public final class AsyncFirebaseReader<T> implements ValueEventListener {
         fb.addListenerForSingleValueEvent(reader);
         return reader.get();
     }
+    public static <T> T getValue(Firebase fb, GenericTypeIndicator<T> type) { //throws no errors
+        AsyncFirebaseReader<T> reader = create(type);
+        fb.addListenerForSingleValueEvent(reader);
+        return reader.get();
+    }
 
     public static <T> T getValueWithError(Firebase fb, Class<T> type) throws FirebaseException {
+        AsyncFirebaseReader<T> reader = create(type);
+        fb.addListenerForSingleValueEvent(reader);
+        return reader.getWithError();
+    }
+    public static <T> T getValueWithError(Firebase fb, GenericTypeIndicator<T> type) throws FirebaseException {
         AsyncFirebaseReader<T> reader = create(type);
         fb.addListenerForSingleValueEvent(reader);
         return reader.getWithError();

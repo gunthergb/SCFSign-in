@@ -27,11 +27,10 @@ public abstract class FirebaseObject {
     public final Firebase getRef() {
         return ref;
     }
-
     @Override
     public String toString() {
         if(ref != null) {
-            return ref.getPath().toString();
+            return getClass().getSimpleName() + "[path=" + ref.getPath() + "]";
         } else {
             return super.toString();
         }

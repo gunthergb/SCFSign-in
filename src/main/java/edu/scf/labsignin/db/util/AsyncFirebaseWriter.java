@@ -26,7 +26,7 @@ public final class AsyncFirebaseWriter implements Firebase.CompletionListener {
      * @param dest the firebase to set
      * @return true the value was successfully set, false otherwise.
      */
-    public static boolean setValue(Object val, Firebase dest) {
+    public static boolean setValue(Firebase dest, Object val) {
         AsyncFirebaseWriter writer = new AsyncFirebaseWriter();
         dest.setValue(val,writer);
         try {
@@ -49,7 +49,7 @@ public final class AsyncFirebaseWriter implements Firebase.CompletionListener {
      * @param val the value to set to the firebase
      * @param dest the firebase to set
      */
-    public static void setValueWithError(Object val, Firebase dest) throws InterruptedException, FirebaseException {
+    public static void setValueWithError(Firebase dest, Object val) throws InterruptedException, FirebaseException {
         AsyncFirebaseWriter writer = new AsyncFirebaseWriter();
         dest.setValue(val,writer);
         writer.latch.await();//Wait for upload...
@@ -62,7 +62,7 @@ public final class AsyncFirebaseWriter implements Firebase.CompletionListener {
     @Override
     public void onComplete(FirebaseError firebaseError, Firebase firebase) {
         ensureSingleUse();
-        success = firebaseError != null && firebase != null;
+        success = firebaseError == null && firebase != null;
         if(firebaseError != null) {
             error = firebaseError.toException();
         }
