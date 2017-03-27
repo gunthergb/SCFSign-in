@@ -1,6 +1,7 @@
 package edu.scf.labsignin.db.util;
 
 import com.firebase.client.*;
+import edu.scf.labsignin.db.FirebaseObject;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -92,6 +93,11 @@ public final class AsyncFirebaseReader<T> implements ValueEventListener {
                 value = (T) dataSnapshot.getValue();
             } else { //Try to turn it into more meaningful data
                 value = dataSnapshot.getValue(dataType);
+            }
+            if(value instanceof FirebaseObject) {
+                //Set the ref if its a common firebase object (for ease of use)
+                FirebaseObject fbo = (FirebaseObject) value;
+                fbo.setRef(dataSnapshot.getRef());
             }
         } catch (FirebaseException exception) {//Something went wrong when trying to interpret the data...
             //Return back the exception to be dealt with later.

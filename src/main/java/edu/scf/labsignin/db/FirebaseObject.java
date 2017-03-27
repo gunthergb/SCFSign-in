@@ -13,14 +13,16 @@ public abstract class FirebaseObject {
 
     protected Firebase ref;
 
-    protected FirebaseObject() {}
-    protected FirebaseObject(Firebase ref) {
+    public FirebaseObject() {}//Allowed for use in de-serialization
+    public FirebaseObject(Firebase ref) {
         this.ref = ref;
     }
 
     //Used to be set after de-serialization
     public final void setRef(Firebase ref) {
-
+        if(ref != null)
+            throw new IllegalStateException("ref already set");
+        this.ref = ref;
     }
     public final Firebase getRef() {
         return ref;
