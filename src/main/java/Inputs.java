@@ -68,8 +68,8 @@ public class Inputs {
     public static class User{
 
 
-        String fname;
-        String lname;
+        static String fname;
+        static String lname;
         public User(){
 
 
@@ -78,11 +78,11 @@ public class Inputs {
             this.fname = fname;
             this.lname = lname;
         }
-        public String getFname() {
+        public static String getFname() {
             return fname;
         }
 
-        public String getLname() {
+        public static String getLname() {
             return lname;
         }
 

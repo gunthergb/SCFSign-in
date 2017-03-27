@@ -1,3 +1,6 @@
+import Util.CurrentTime;
+import com.firebase.client.Firebase;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -19,6 +22,10 @@ public class DialogSubjectSelector extends JDialog implements ActionListener {
         this.setLocationRelativeTo((Component)null);
         this.setVisible(true);
     }
+
+    public static JComboBox subjects;
+
+    public static String time;
 
     public static String[] classSubjects = {"CGS 1000: Computer Info Systems", "CGS 1570: Integrated Business Apps",
             "CGS 2820C: Web Page Development", "COP 2510: Programming Concepts", "COP 2170: Visual Basic Programming",
@@ -57,7 +64,7 @@ public class DialogSubjectSelector extends JDialog implements ActionListener {
     }
 
     private static String row1(int size, Color c, String name) {
-        return "Hi, " + font(size, rgb(c), name);
+        return "Hi, " + font(size, rgb(c), name) + " !";
     }
 
 
@@ -78,43 +85,14 @@ public class DialogSubjectSelector extends JDialog implements ActionListener {
 
     private Container midPanel(){
         Box p = Box.createVerticalBox();
-        JComboBox subjects = new JComboBox(classSubjects);
+        subjects = new JComboBox(classSubjects);
+        //JComboBox subjects = new JComboBox(classSubjects);
         subjects.setSelectedIndex(0);
-        setFlatBox(subjects);
-        //subjects.setBorder(new EmptyBorder(0,0,0,0));
         p.setBackground(Color.WHITE);
         p.setOpaque(true);
-        //p.add(Box.createVerticalStrut(5));
         p.add(subjects);
 
         return p;
-
-    }
-
-    private static void setFlatBox(JComboBox box){
-        UIDefaults d = new UIDefaults();
-//     putClientProperty("Nimbus.Overrides", d);
-//     putClientProperty("Nimbus.Overrides.InheritDefaults", false);
-//     JComponent c = (JComponent) getEditor().getEditorComponent();
-//     c.putClientProperty("Nimbus.Overrides", d);
-//     c.putClientProperty("Nimbus.Overrides.InheritDefaults", false);
-//     c.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-
-        Painter<JComponent> emptyPainter = new Painter<JComponent>() {
-            public void paint(Graphics2D g, JComponent c, int w, int h) {
-        /* Empty painter */
-            }
-        };
-        d.put("TextField.borderPainter", emptyPainter);
-        d.put("TextField[Enabled].borderPainter", emptyPainter);
-        d.put("TextField[Focused].borderPainter", emptyPainter);
-        d.put("ComboBox:\"ComboBox.textField\"[Enabled].backgroundPainter", emptyPainter);
-        d.put("ComboBox:\"ComboBox.textField\"[Selected].backgroundPainter", emptyPainter);
-        d.put("ComboBox[Editable+Focused].backgroundPainter", emptyPainter);
-        box.putClientProperty("Nimbus.Overrides", d);
-        JComponent c = (JComponent) box.getEditor().getEditorComponent();
-        c.putClientProperty("Nimbus.Overrides", d);
-        c.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
     }
 
@@ -137,64 +115,94 @@ public class DialogSubjectSelector extends JDialog implements ActionListener {
 
 
     public void actionPerformed(ActionEvent e) {
+
+        Firebase mref = new Firebase("https://lab-sign-in-database.firebaseio.com/");
+        auth(mref);
+
+        String firstname = LoginFrame.firstname.getText().trim();
+        String lastname = LoginFrame.lastname.getText().trim();
+        Object classSubjects = subjects.getSelectedItem();
+        time = CurrentTime.systemtime();
+        //String time = CurrentTime.systemtime();
+
+
+        //Name name = new Name();
+
+        Firebase user_dir = mref.child("Users").child(firstname + "_" + lastname);
+        Firebase user_his = mref.child("Users History").child(firstname + "_" + lastname);
+        Name a = new Name(firstname, lastname, classSubjects, time);
+
+        a.setLname(lastname);
+        a.setFname(firstname);
+        a.setClassSubjects(classSubjects);
+        a.setTime(time);
+
+        user_dir.setValue(a);
+        user_his.setValue(a);
+
+        //mref.child("Users").setValue(name);
+
+        //Database.saveData();
         dispose();
         new DialogConfirm();
+    }
+
+    public class Name {
+        private String firstname;
+        private String lastname;
+        private Object classSubjects;
+        private String time;
+
+        public Name() {}
+
+        Name(String fname, String lname, Object classSubjects, String time){
+            this.firstname = fname;
+            this.lastname = lname;
+            this.classSubjects = (String) classSubjects;
+            this.time = time;
+        }
+
+        public String getName() {
+            return firstname;
+        }
+
+        public String getLname(){
+            return lastname;
+        }
+
+        public String getClassSubjects(){
+            return (String) classSubjects;
+        }
+
+        public String getTime(){
+            return time;
+        }
+
+        public void setLname(String lastname) {
+            this.lastname = lastname;
+        }
+
+        public void setFname(String firstname){
+            this.firstname = firstname;
+        }
+
+        public void setClassSubjects(Object classSubjects){
+            this.classSubjects = classSubjects;
+        }
+
+        public void setTime(String time){
+            this.time = time;
+        }
+
+    }
+
+    public static void auth(Firebase mRef) {
+        String token = Token.genToken();
+        System.out.println("Token:" + token);
+        mRef.authWithCustomToken(token,null);
     }
 
     public static void main(String[] args) {
         new DialogSubjectSelector();
     }
-
-    /*class EditorCombo extends JComboBox<String> {
-        public EditorCombo() {
-            super();
-            setEditable(true);
-            for (int i = 0; i < 10; i++) {
-                addItem("Sample" + i);
-            }
-        }
-        @Override public void updateUI() {
-            //super.updateUI();
-            setUI(new javax.swing.plaf.synth.SynthComboBoxUI() {
-                @Override
-                protected JButton createArrowButton() {
-                    JButton button = new JButton() {
-                        @Override
-                        public int getWidth() {
-                            return 0;
-                        }
-                    };
-                    button.setBorder(BorderFactory.createEmptyBorder());
-                    button.setVisible(false);
-                    return button;
-                }
-                @Override
-                public void configureArrowButton() {
-                }
-            });
-            UIDefaults d = new UIDefaults();
-//     putClientProperty("Nimbus.Overrides", d);
-//     putClientProperty("Nimbus.Overrides.InheritDefaults", false);
-//     JComponent c = (JComponent) getEditor().getEditorComponent();
-//     c.putClientProperty("Nimbus.Overrides", d);
-//     c.putClientProperty("Nimbus.Overrides.InheritDefaults", false);
-//     c.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-
-            Painter<JComponent> emptyPainter = new Painter<JComponent>() {
-                public void paint(Graphics2D g, JComponent c, int w, int h) {
-        *//* Empty painter *//*
-                }
-            };
-            d.put("TextField.borderPainter", emptyPainter);
-            d.put("TextField[Enabled].borderPainter", emptyPainter);
-            d.put("TextField[Focused].borderPainter", emptyPainter);
-            d.put("ComboBox:\"ComboBox.textField\"[Enabled].backgroundPainter", emptyPainter);
-            d.put("ComboBox:\"ComboBox.textField\"[Selected].backgroundPainter", emptyPainter);
-            d.put("ComboBox[Editable+Focused].backgroundPainter", emptyPainter);
-            putClientProperty("Nimbus.Overrides", d);
-            JComponent c = (JComponent) getEditor().getEditorComponent();
-            c.putClientProperty("Nimbus.Overrides", d);
-            c.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        }
-    }*/
 }

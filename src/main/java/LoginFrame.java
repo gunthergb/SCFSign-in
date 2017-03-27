@@ -1,5 +1,7 @@
 import Util.MyDocumentFilter;
+import com.firebase.client.*;
 import org.jdesktop.swingx.prompt.PromptSupport;
+import sun.rmi.runtime.Log;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -9,6 +11,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+
+import static com.sun.org.apache.xalan.internal.xsltc.compiler.sym.error;
+import static java.lang.System.in;
 
 /**
  * This is the main login form...
@@ -171,13 +176,6 @@ public class LoginFrame extends JFrame {
 
                 //Recognition
                 ((AbstractDocument) firstname.getDocument()).setDocumentFilter(new MyDocumentFilter());
-
-                /*JTextField fname = new JTextField();
-                PromptSupport.setPrompt("First Name", fname);
-                fname.setFont(fname.getFont().deriveFont(24f));
-                fname.setMargin(new Insets(5,5,5,5));
-                fname.setBackground(Color.WHITE);
-                name.add(fname);*/
             }
             name.add(Box.createVerticalStrut(10));
             {
@@ -190,12 +188,6 @@ public class LoginFrame extends JFrame {
                 name.add(lastname);
 
                 ((AbstractDocument) lastname.getDocument()).setDocumentFilter(new MyDocumentFilter());
-                /*JTextField lname = new JTextField();
-                PromptSupport.setPrompt("Last Name", lname);
-                lname.setFont(lname.getFont().deriveFont(24f));
-                lname.setBackground(Color.WHITE);
-                lname.setMargin(new Insets(5,5,5,5));
-                name.add(lname);*/
             }
         }
 
@@ -217,7 +209,19 @@ public class LoginFrame extends JFrame {
             {
                 b1.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        new DialogSubjectSelector();
+                        if (firstname.getText().equals("") || lastname.getText().equals(""))
+                        {
+                            JOptionPane optionPane = new JOptionPane("Please fill in the first name and last name", JOptionPane.ERROR_MESSAGE);
+                            JDialog dialog = optionPane.createDialog("Fill in textboxes");
+                            dialog.setAlwaysOnTop(true);
+                            dialog.setVisible(true);
+                        }
+                        else
+                        {
+                            //firstname.getText() = Inputs.User.getFname();
+                            Inputs.User.getLname();
+                            new DialogSubjectSelector();
+                        }
                     }
                 });
             }
@@ -234,6 +238,66 @@ public class LoginFrame extends JFrame {
             b2.setContentAreaFilled(false);
             b2.setBackground(Color.RED);
             b2.setOpaque(true);
+
+            //Action
+            {
+                b2.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        if (firstname.getText().equals("") || lastname.getText().equals(""))
+                        {
+                            JOptionPane optionPane = new JOptionPane("Please fill in the first name and last name", JOptionPane.ERROR_MESSAGE);
+                            JDialog dialog = optionPane.createDialog("Fill in textboxes");
+                            dialog.setAlwaysOnTop(true);
+                            dialog.setVisible(true);
+                        }
+                        else
+                        {
+                            //firstname.getText() = Inputs.User.getFname();
+                            Inputs.User.getLname();
+
+                            Firebase mref = new Firebase("https://lab-sign-in-database.firebaseio.com/");
+                            DialogSubjectSelector.auth(mref);
+                            String firstname = LoginFrame.firstname.getText().trim();
+                            String lastname = LoginFrame.lastname.getText().trim();
+
+                            Firebase listOfObjects = mref.orderByChild(firstname + "_" + lastname).getRef();
+
+                            listOfObjects.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    dataSnapshot.getRef().removeValue();
+                                }
+
+                                @Override
+                                public void onCancelled(FirebaseError firebaseError) {
+
+                                }
+                            });
+
+                            //Query removeQuery = mref.child("Users").child(firstname + "_" + lastname).equalTo(firstname + "_" + lastname);
+
+                            /*removeQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                                        appleSnapshot.getRef().removeValue();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(FirebaseError firebaseError) {
+                                    System.out.println("Cancelled");
+                                }
+                            });*/
+
+
+
+
+                            new Signout();
+                        }
+                    }
+                });
+            }
 
 
             maincontent.add(b1);
