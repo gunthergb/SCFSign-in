@@ -1,12 +1,12 @@
 package edu.scf.labsignin;
 
-import edu.scf.labsignin.util.CurrentTime;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -14,8 +14,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class Signout extends JDialog {
 
+    private final long duration;
 
-    Signout(){
+    Signout(long duration){
+        this.duration = duration;
         this.setLayout(new BorderLayout());
         this.setUndecorated(true);
         this.add(allContent());
@@ -40,8 +42,9 @@ public class Signout extends JDialog {
         b.add(Box.createHorizontalStrut(20));
 
 
+        String format = new SimpleDateFormat("m:s ").format(new Date(duration));
 
-        b.add(this.messagePrompt(LoginFrame.firstName() + ' ' + LoginFrame.lastName() , CurrentTime.systemtime()));//, //totaltime));
+        b.add(this.messagePrompt(LoginFrame.firstName() + ' ' + LoginFrame.lastName() , format));//, //totaltime));
         b.setBackground(Color.WHITE);
         b.setOpaque(true);
         return b;
@@ -113,7 +116,7 @@ public class Signout extends JDialog {
     }
 
     public static void main(String[] args) {
-        new Signout();
+        new Signout(TimeUnit.MINUTES.toMillis(1) + TimeUnit.SECONDS.toMillis(30));
     }
 
 }

@@ -1,13 +1,16 @@
 package edu.scf.labsignin;
 
-import edu.scf.labsignin.util.CurrentTime;
 import com.firebase.client.Firebase;
+import edu.scf.labsignin.db.DB;
+import edu.scf.labsignin.db.DBException;
+import edu.scf.labsignin.db.Students;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
 
 /**
  * Created by Gunther on 3/21/17.
@@ -25,13 +28,13 @@ public class DialogSubjectSelector extends JDialog implements ActionListener {
         this.setVisible(true);
     }
 
-    public static JComboBox subjects;
+    public static JComboBox<String> subjects;
 
     public static String time;
 
-    public static String[] classSubjects = {"CGS 1000: Computer Info Systems", "CGS 1570: Integrated Business Apps",
+/*    public static String[] classSubjects = {"CGS 1000: Computer Info Systems", "CGS 1570: Integrated Business Apps",
             "CGS 2820C: Web Page Development", "COP 2510: Programming Concepts", "COP 2170: Visual Basic Programming",
-            "COP 2250: Java Programming I and II", "Other"};
+            "COP 2250: Java Programming I and II", "Other"};*/
 
     private Container allcontent(){
         Box b = Box.createVerticalBox();
@@ -87,12 +90,28 @@ public class DialogSubjectSelector extends JDialog implements ActionListener {
 
     private Container midPanel(){
         Box p = Box.createVerticalBox();
-        subjects = new JComboBox(classSubjects);
+        subjects = new JComboBox<>(new String[]{"Loading..."});
         //JComboBox subjects = new JComboBox(classSubjects);
         subjects.setSelectedIndex(0);
         p.setBackground(Color.WHITE);
         p.setOpaque(true);
         p.add(subjects);
+
+
+        DB.getInstance().subjects().getSubjectsAndListen(subjectsDB -> {
+            System.out.println("Syncing Subjects...");
+            SwingUtilities.invokeLater(() -> {
+
+                String[] subject_names = new String[subjectsDB.length];
+                for (int i = 0; i < subjectsDB.length; i++) {
+                    subject_names[i] = subjectsDB[i].getName();
+                }
+
+                subjects.setModel(new DefaultComboBoxModel<>(subject_names));
+
+                System.out.println("Subjects Updated!");
+            });
+        });
 
         return p;
 
@@ -118,35 +137,28 @@ public class DialogSubjectSelector extends JDialog implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
 
-        Firebase mref = new Firebase("https://lab-sign-in-database.firebaseio.com/");
-        auth(mref);
+        String firstName = LoginFrame.firstName();
+        String lastName = LoginFrame.lastName();
+        String subject = (String) subjects.getSelectedItem();
+        Date now = new Date();
 
-        String firstname = LoginFrame.firstname.getText().trim();
-        String lastname = LoginFrame.lastname.getText().trim();
-        Object classSubjects = subjects.getSelectedItem();
-        time = CurrentTime.systemtime();
-        //String time = CurrentTime.systemtime();
+        try {
+            Students handler = DB.getInstance().students();
+            System.out.println("Logging in...");
+            if(handler.login(firstName,lastName,subject,now)) {
+                System.out.println("Logged in!");
+                dispose();
+                new DialogConfirm();
+            } else {
+                System.out.println("Database sucks l2internet");
+            }
+        } catch (DBException dbe) {
+            //TODO user already logged in
+            System.out.println("already logged in, wow, stop hacking");
+        }
 
 
-        //Name name = new Name();
 
-        Firebase user_dir = mref.child("Users").child(firstname + "_" + lastname);
-        Firebase user_his = mref.child("Users History").child(firstname + "_" + lastname);
-        Name a = new Name(firstname, lastname, classSubjects, time);
-
-        a.setLname(lastname);
-        a.setFname(firstname);
-        a.setClassSubjects(classSubjects);
-        a.setTime(time);
-
-        user_dir.setValue(a);
-        user_his.setValue(a);
-
-        //mref.child("Users").setValue(name);
-
-        //Database.saveData();
-        dispose();
-        new DialogConfirm();
     }
 
     public class Name {

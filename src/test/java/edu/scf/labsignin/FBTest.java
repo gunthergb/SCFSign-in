@@ -1,6 +1,7 @@
 package edu.scf.labsignin;
 
 import com.firebase.client.Firebase;
+import edu.scf.labsignin.db.DB;
 
 public final class FBTest {
 
@@ -8,7 +9,7 @@ public final class FBTest {
 
     public static Firebase root() {
         Firebase fb = new Firebase(FIREBASE_URL);
-        Database.auth(fb);
+        DB.auth(fb);
         return fb;
     }
 

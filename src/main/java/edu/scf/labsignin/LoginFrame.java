@@ -1,7 +1,9 @@
 package edu.scf.labsignin;
 
+import edu.scf.labsignin.db.DB;
+import edu.scf.labsignin.db.DBException;
+import edu.scf.labsignin.db.Students;
 import edu.scf.labsignin.util.MyDocumentFilter;
-import com.firebase.client.*;
 import org.jdesktop.swingx.prompt.PromptSupport;
 
 import javax.imageio.ImageIO;
@@ -12,6 +14,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * This is the main login form...
@@ -43,11 +46,11 @@ public class LoginFrame extends JFrame {
     }
 
     public static String firstName(){
-        return firstname.getText();
+        return firstname == null ? "NULL" : firstname.getText();
     }
 
     public static String lastName(){
-        return lastname.getText();
+        return lastname == null ? "NULL" : lastname.getText();
     }
 
     private static boolean setLAF(){
@@ -207,18 +210,20 @@ public class LoginFrame extends JFrame {
             {
                 b1.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        if (firstname.getText().equals("") || lastname.getText().equals(""))
+                        if (firstname.getText().isEmpty() || lastname.getText().isEmpty())
                         {
-                            JOptionPane optionPane = new JOptionPane("Please fill in the first name and last name", JOptionPane.ERROR_MESSAGE);
-                            JDialog dialog = optionPane.createDialog("Fill in textboxes");
-                            dialog.setAlwaysOnTop(true);
-                            dialog.setVisible(true);
+                            error("Fill in textboxes","Please fill in the first name and last name");
                         }
                         else
                         {
+                            Students handler = DB.getInstance().students();
+                            if(handler.isLoggedIn(firstName(),lastName())) {
+                                error("Already logged in","You are already logged in!!");
+                            } else {
+                                Inputs.User.getLname();
+                                new DialogSubjectSelector();
+                            }
                             //firstname.getText() = Inputs.User.getFname();
-                            Inputs.User.getLname();
-                            new DialogSubjectSelector();
                         }
                     }
                 });
@@ -241,57 +246,29 @@ public class LoginFrame extends JFrame {
             {
                 b2.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        if (firstname.getText().equals("") || lastname.getText().equals(""))
+                        if (firstname.getText().isEmpty() || lastname.getText().isEmpty())
                         {
-                            JOptionPane optionPane = new JOptionPane("Please fill in the first name and last name", JOptionPane.ERROR_MESSAGE);
-                            JDialog dialog = optionPane.createDialog("Fill in textboxes");
-                            dialog.setAlwaysOnTop(true);
-                            dialog.setVisible(true);
+                            error("Fill in textboxes","Please fill in the first name and last name");
                         }
                         else
                         {
-                            //firstname.getText() = Inputs.User.getFname();
-                            Inputs.User.getLname();
 
-                            Firebase mref = new Firebase("https://lab-sign-in-database.firebaseio.com/");
-                            DialogSubjectSelector.auth(mref);
-                            String firstname = LoginFrame.firstname.getText().trim();
-                            String lastname = LoginFrame.lastname.getText().trim();
+                            String first = firstName();
+                            String last  = lastName();
+                            Date now = new Date();
 
-                            Firebase listOfObjects = mref.orderByChild(firstname + "_" + lastname).getRef();
-
-                            listOfObjects.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    dataSnapshot.getRef().removeValue();
-                                }
-
-                                @Override
-                                public void onCancelled(FirebaseError firebaseError) {
-
-                                }
-                            });
-
-                            //Query removeQuery = mref.child("Users").child(firstname + "_" + lastname).equalTo(firstname + "_" + lastname);
-
-                            /*removeQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
-                                        appleSnapshot.getRef().removeValue();
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(FirebaseError firebaseError) {
-                                    System.out.println("Cancelled");
-                                }
-                            });*/
+                            Students handler = DB.getInstance().students();
+                            try {
+                                System.out.println("Logging out...");
+                                long loggedInTime = handler.logout(first,last,now);
+                                System.out.println("Logged out!");
+                                new Signout(loggedInTime);
+                            } catch (DBException ignored) {
+                                error("DBError","You were not logged in?");
+                            }
 
 
 
-
-                            new Signout();
                         }
                     }
                 });
@@ -304,6 +281,13 @@ public class LoginFrame extends JFrame {
         }
 
         return maincontent;
+    }
+
+    private static void error(String title, String msg) {
+        JOptionPane optionPane = new JOptionPane(msg, JOptionPane.ERROR_MESSAGE);
+        JDialog dialog = optionPane.createDialog(title);
+        dialog.setAlwaysOnTop(true);
+        dialog.setVisible(true);
     }
 
 }

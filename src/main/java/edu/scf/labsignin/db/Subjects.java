@@ -22,8 +22,8 @@ public final class Subjects extends FirebaseObject {
     }
 
     //Get subjects later...
-    public void getSubjectsLater(Consumer<Subject[]> consumer) {
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+    public void getSubjectsAndListen(Consumer<Subject[]> consumer) {
+        ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Map<String,Subject> map = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Subject>>() {});
@@ -32,7 +32,6 @@ public final class Subjects extends FirebaseObject {
             }
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                System.out.println(false);
             }
         });
     }
@@ -40,8 +39,10 @@ public final class Subjects extends FirebaseObject {
     //sets the subjects
     public boolean setSubjects(Subject[] subjects) {
         Map<String,Subject> mapped = new HashMap<>();
-        for(Subject s : subjects) {
-            mapped.put(s.getName(),s);
+        if(subjects != null) {
+            for(Subject s : subjects) {
+                mapped.put(s.getName(),s);
+            }
         }
         return AsyncFirebaseWriter.setValue(getRef(),mapped);
     }
