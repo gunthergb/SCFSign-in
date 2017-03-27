@@ -20,7 +20,7 @@ public abstract class FirebaseObject {
 
     //Used to be set after de-serialization
     public final void setRef(Firebase ref) {
-        if(ref != null)
+        if(this.ref != null)
             throw new IllegalStateException("ref already set");
         this.ref = ref;
     }
@@ -30,6 +30,10 @@ public abstract class FirebaseObject {
 
     @Override
     public String toString() {
-        return ref.getPath().toString();
+        if(ref != null) {
+            return ref.getPath().toString();
+        } else {
+            return super.toString();
+        }
     }
 }

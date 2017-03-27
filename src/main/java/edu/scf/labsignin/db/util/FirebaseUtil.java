@@ -2,6 +2,7 @@ package edu.scf.labsignin.db.util;
 
 import com.firebase.client.Firebase;
 import edu.scf.labsignin.Database;
+import edu.scf.labsignin.db.Subject;
 
 /**
  * Firebase Utility methods.
@@ -16,10 +17,13 @@ public final class FirebaseUtil {
         Firebase ROOT = new Firebase("https://lab-sign-in-database.firebaseio.com");
         Database.auth(ROOT);
 
-        Firebase fb = ROOT.child("testing");
+        Firebase fb = ROOT.child("testing2");
 
-        AsyncFirebaseWriter.setValue(new User("dope"),fb);//Write the value...
-        User val = AsyncFirebaseReader.getValue(fb,User.class);//Read the value...
+        Subject s = new Subject();
+        s.setName("lel");
+
+        AsyncFirebaseWriter.setValueWithError(s,fb);//Write the value...
+        Subject val = AsyncFirebaseReader.getValueWithError(fb,Subject.class);//Read the value...
 
         System.out.println(val);
 
