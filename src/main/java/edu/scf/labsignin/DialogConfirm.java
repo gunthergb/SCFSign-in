@@ -17,10 +17,10 @@ public class DialogConfirm extends JDialog implements ActionListener {
     DialogConfirm(){
         this.setLayout(new BorderLayout());
         this.setUndecorated(true);
+        this.setAlwaysOnTop(true);
         this.add(allContent());
         this.setModal(true);
         this.pack();
-        this.setAlwaysOnTop(true);
         this.setLocationRelativeTo((Component)null);
         this.setVisible(true);
     }
@@ -53,18 +53,16 @@ public class DialogConfirm extends JDialog implements ActionListener {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////Timer///////////////////////////////////////////////////////////////////////////////////////////////
         {
-            final Timer timer = new Timer((int)TimeUnit.SECONDS.toMillis(10), new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    dispose();
-                    setVisible(false);
-                    LoginFrame.clearField();
-                    Timer t = (Timer) e.getSource();
-                    t.stop();
-                }
+            final Timer timer = new Timer((int)TimeUnit.SECONDS.toMillis(10), e -> {
+                dispose();
+                setVisible(false);
+                LoginFrame.clearField();
+                Timer t = (Timer) e.getSource();
+                t.stop();
             });
 
             timer.start();
-            setVisible(true);
+            //setVisible(true);
             System.out.println("Auto-Close Dialog");
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////

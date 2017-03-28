@@ -1,5 +1,7 @@
 package edu.scf.labsignin;
 
+import edu.scf.labsignin.util.CurrentTime;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -20,10 +22,10 @@ public class Signout extends JDialog {
         this.duration = duration;
         this.setLayout(new BorderLayout());
         this.setUndecorated(true);
+        this.setAlwaysOnTop(true);
         this.add(allContent());
         this.setModal(true);
         this.pack();
-        this.setAlwaysOnTop(true);
         this.setLocationRelativeTo((Component)null);
         this.setVisible(true);
 
@@ -44,7 +46,7 @@ public class Signout extends JDialog {
 
         String format = new SimpleDateFormat("m:s ").format(new Date(duration));
 
-        b.add(this.messagePrompt(LoginFrame.firstName() + ' ' + LoginFrame.lastName() , format));//, //totaltime));
+        b.add(this.messagePrompt(LoginFrame.firstName() + ' ' + LoginFrame.lastName() , format, CurrentTime.systemtime()));//, //totaltime));
         b.setBackground(Color.WHITE);
         b.setOpaque(true);
         return b;
@@ -57,7 +59,7 @@ public class Signout extends JDialog {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////Timer///////////////////////////////////////////////////////////////////////////////////////////////
         {
-            final Timer timer = new Timer((int) TimeUnit.SECONDS.toMillis(10), new ActionListener() {
+            final Timer timer = new Timer((int) TimeUnit.SECONDS.toMillis(6), new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     dispose();
                     setVisible(false);
@@ -68,7 +70,7 @@ public class Signout extends JDialog {
             });
 
             timer.start();
-            setVisible(true);
+            //setVisible(true);
             System.out.println("Auto-Close Dialog");
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,15 +102,15 @@ public class Signout extends JDialog {
         return "Total time: " + font(size, rgb(c), time);
     }
 
-    private static String row3(int size, Color c, String time) {
-        return "Current time: " + font(size, rgb(c), time);
+    private static String row3(int size, Color c, String currentime) {
+        return "Current time: " + font(size, rgb(c), currentime);
     }
 
-    private Component messagePrompt(String name, String time){//, long totaltime) {
+    private Component messagePrompt(String name, String time, String currenttime){//, long totaltime) {
         byte size = 12;
         Color outer_color = Color.BLUE;
         Color keyvar_color = Color.RED;
-        JLabel mP = new JLabel(html(font(size, rgb(outer_color), row1(size, keyvar_color, name) + "<br>" + row2(12, keyvar_color, time)) + "<br><hr noshade>" + font(4, rgb(outer_color), row3(4, keyvar_color, time))));
+        JLabel mP = new JLabel(html(font(size, rgb(outer_color), row1(size, keyvar_color, name) + "<br>" + row2(12, keyvar_color, time)) + "<br><hr noshade>" + font(4, rgb(outer_color), row3(4, keyvar_color, currenttime))));
         mP.setBackground(Color.WHITE);
         mP.setOpaque(true);
         mP.setMaximumSize(new Dimension(32767, 32767));
